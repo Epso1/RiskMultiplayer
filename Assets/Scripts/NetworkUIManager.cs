@@ -22,7 +22,7 @@ public class NetworkUIManager : NetworkBehaviour
         createGameButton.onClick.AddListener(() => { TryStartHost(); });
         joinGameButton.onClick.AddListener(() => { TryStartClient(); });
         disconnectButton.onClick.AddListener(() => { TryShutdown(); });
-        updatePlayersButton.onClick.AddListener(() => { TryUpdateText(); });
+        updatePlayersButton.onClick.AddListener(() => { TryUpdatePlayerIdsText(); });
     }
     public override void OnNetworkSpawn()
     {
@@ -97,7 +97,7 @@ public class NetworkUIManager : NetworkBehaviour
 
 
     // Método puente para controlar si se ha inicializado la red antes de actualizar el texto
-    private void TryUpdateText()
+    private void TryUpdatePlayerIdsText()
     {
         if (!isNetworkSpawn)
         {
