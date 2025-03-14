@@ -3,6 +3,7 @@ using Unity.Netcode;
 
 public class PlayerSpawnManager : NetworkBehaviour
 {
+    public NetworkVariable<int> spawnIndex = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     // Arrastra tus puntos de spawn desde el Inspector.
     public Transform[] spawnPoints;
 
@@ -21,23 +22,19 @@ public class PlayerSpawnManager : NetworkBehaviour
     public void OnClientConnectedServerRpc(ulong clientId)
     {
         // Selecciona un spawn point de forma cíclica
-        int spawnIndex = (int)(clientId % (ulong)spawnPoints.Length);
-        Vector3 spawnPosition = spawnPoints[spawnIndex].position;
+        int spawnIndexTemp = (int)clientId;
+        spawnIndex.Value = spawnIndexTemp;
+        Vector3 spawnPosition = spawnPoints[spawnIndex.Value].position;
 
-        var playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject; // Obtener el objeto jugador del cliente
-        PlayerController playerController = playerObject.GetComponent<PlayerController>(); // Obtener el playerController del objeto del jugador
-        playerController.playerName = "Player" + clientId; // Le damos un nombre al jugador
-        playerObject.transform.position = spawnPosition; // Asigna la posición de spawn al jugador
-        Debug.Log($"Jugador {playerController.playerName} spawneado en: {spawnPosition}");
-        OnClientConnectedClientRpc(clientId);     
+        var playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+        PlayerController playerController = playerObject.GetComponent<PlayerController>();
+        playerController.playerName.Value = "Player" + clientId;
+        playerObject.transform.position = spawnPosition; // Actualiza en el servidor
+        Debug.Log($"Jugador {playerController.playerName.Value} spawneado en: {spawnPosition}");
+
+        // Notifica al cliente para actualizar su posición
+        playerController.SetSpawnPositionClientRpc(spawnPosition);
     }
 
-    [ClientRpc]
-    public void OnClientConnectedClientRpc(ulong clientId)
-    {
-         foreach (PlayerController playerCon in FindObjectsOfType<PlayerController>())
-        {
-            playerCon.UpdatePlayerNameText();
-        }
-    }
+
 }

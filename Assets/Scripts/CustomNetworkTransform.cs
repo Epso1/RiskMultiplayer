@@ -1,5 +1,5 @@
 using Unity.Netcode.Components;
-public class ClientNetworkTransform : NetworkTransform
+public class CustomNetworkTransform : NetworkTransform
 {
     protected override bool OnIsServerAuthoritative()
     {

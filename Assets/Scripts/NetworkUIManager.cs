@@ -101,7 +101,7 @@ public class NetworkUIManager : NetworkBehaviour
     {
         if (!isNetworkSpawn)
         {
-            playerIdsText.text = "No connected players";
+            playerIdsText.text = "Player not connected.";
         }
         else RequestUpdatePlayerIdsTextServerRpc();
     }
